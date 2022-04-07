@@ -29,16 +29,28 @@ func TestJust(t *testing.T) {
 	}
 }
 
+//func TestConcurrentProcess(t *testing.T) {
+//	observable := rxgo.Range(1, 4).FlatMap(func(i rxgo.Item) rxgo.Observable {
+//		logMsg("proc %v", i.V)
+//		return rxgo.Range(1, 4).Map(func(_ context.Context, v interface{}) (interface{}, error) {
+//			logMsg("task %v emit %v", i.V, v)
+//			//time.Sleep(time.Millisecond * time.Duration(rand.Intn(200)))
+//			time.Sleep(time.Second * time.Duration(rand.Intn(5)))
+//			return fmt.Sprintf("task %v emit %v", i.V, v), nil
+//		}, rxgo.WithPool(4))
+//	}, rxgo.WithBufferedChannel(4)).DoOnNext(func(s interface{}) {
+//		logMsg("~~~ %v", s)
+//	})
+//	<-observable
+//}
+
 func TestConcurrentProcess(t *testing.T) {
-	observable := rxgo.Range(1, 4).FlatMap(func(i rxgo.Item) rxgo.Observable {
-		logMsg("proc %v", i.V)
-		return rxgo.Range(1, 4).Map(func(_ context.Context, v interface{}) (interface{}, error) {
-			logMsg("task %v emit %v", i.V, v)
-			//time.Sleep(time.Millisecond * time.Duration(rand.Intn(200)))
-			time.Sleep(time.Second * time.Duration(rand.Intn(5)))
-			return fmt.Sprintf("task %v emit %v", i.V, v), nil
-		}, rxgo.WithPool(4))
-	}, rxgo.WithBufferedChannel(4)).DoOnNext(func(s interface{}) {
+	observable := rxgo.Range(1, 16).Map(func(_ context.Context, v interface{}) (interface{}, error) {
+		logMsg("task emit %v", v)
+		//time.Sleep(time.Millisecond * time.Duration(rand.Intn(200)))
+		time.Sleep(time.Second * time.Duration(rand.Intn(5)))
+		return fmt.Sprintf("task emit %v", v), nil
+	}, rxgo.WithPool(4)).DoOnNext(func(s interface{}) {
 		logMsg("~~~ %v", s)
 	})
 	<-observable
